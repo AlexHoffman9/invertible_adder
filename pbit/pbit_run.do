@@ -6,6 +6,7 @@ vlib work
 #     their own "vlog" line below.
 vlog "./pbit.sv"
 vlog "./prng_32.v"
+vlog "./tanh.v"
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the
 #     testbench module you want to execute.
