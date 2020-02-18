@@ -4,9 +4,10 @@ vlib work
 # Compile Verilog
 #     All Verilog files that are part of this design should have
 #     their own "vlog" line below.
-vlog "./pbit.sv"
+vlog "./pbit.v"
 vlog "./prng_32.v"
 vlog "./tanh.v"
+vlog "./mac.v"
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the
 #     testbench module you want to execute.
