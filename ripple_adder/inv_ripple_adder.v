@@ -39,14 +39,21 @@ always@(*) begin
             {a_clamp[i][1], b_clamp[i][1], cin_clamp[i][1]} = 3'b111;
             {s_clamp[i][1], cout_clamp[i][1]} = 2'b00;
         end
-    end else if (mode == 1) begin // inverse mode, sum and cout are fixed, a,b,cin are floating
+    end
+    //  else if (mode == 1) begin // inverse mode, sum and cout are fixed, a,b,cin are floating
+    //     for (i=0;i<=3;i=i+1) begin
+    //         {a_clamp[i][1], b_clamp[i][1], cin_clamp[i][1]} = 3'b000;
+    //         if (i<3) begin
+    //             {s_clamp[i][1], cout_clamp[i][1]} = 2'b11;
+    //         end else begin
+    //             {s_clamp[i][1], cout_clamp[i][1]} = 2'b10;
+    //         end
+    //     end
+    // end 
+    else if (mode == 1) begin // inverse mode, sum, cin fixed.  a,b,couts] are floating
         for (i=0;i<=3;i=i+1) begin
-            {a_clamp[i][1], b_clamp[i][1], cin_clamp[i][1]} = 3'b000;
-            if (i<3) begin
-                {s_clamp[i][1], cout_clamp[i][1]} = 2'b11;
-            end else begin
-                {s_clamp[i][1], cout_clamp[i][1]} = 2'b10;
-            end
+            {a_clamp[i][1], b_clamp[i][1], cout_clamp[i][1]} = 3'b000;
+            {s_clamp[i][1], cin_clamp[i][1]} = 2'b11;
         end
     end else begin // subtract mode. b = sum-a
         for (i=0;i<=3;i=i+1) begin
@@ -124,16 +131,18 @@ begin
 
     
     // // mode=0 to test forward logic
-    // reset <=1; a <= 6; b <= 1; I_0 <= 1; mode <= 0; #CLOCK_PERIOD;
+    // reset <=1; a <= 7; b <= 9; I_0 <= 1; mode <= 0; #CLOCK_PERIOD;
     // reset <= 0; #CLOCK_PERIOD;
     // for (i=0;i<4;i=i+1) begin
     //     net_sum[i] = 0;
     // end
+    // $fdisplay(test_data, "%d,%d,%d,%d,%d,%d,%d,%d",$time, a_out, b_out, sum_out, overflow, I_0, mode, steps);
     // for (i=0;i<steps;i=i+1) begin
     //     #CLOCK_PERIOD;
     //     for (j=0;j<4;j=j+1) begin // compute avg of each bit of adder sum
     //         net_sum[j] <= net_sum[j] + sum_out[j];
     //     end
+    //     $fdisplay(test_data, "%d,%d,%d,%d,%d",$time, a_out, b_out, sum_out, overflow);
     // end
     // $display("Percentage of cycles where bit was equal to 1:");
     // $display("A=%d,B=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, b, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
@@ -207,6 +216,27 @@ begin
     $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
     $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
     
+
+    $display("\nInverse Sum: a+b=s");
+    // mode=1 to test inverse sum
+    reset <=1; sum <= 12; I_0 <= 1; mode <= 1; #CLOCK_PERIOD; steps=10000;
+    reset <= 0; #CLOCK_PERIOD;
+    for (i=0;i<4;i=i+1) begin
+        net_sum[i] = 0;
+    end
+    $fdisplay(test_data, "%d,%d,%d,%d,%d,%d,%d,%d",$time, a_out, b_out, sum_out, overflow, I_0, mode, steps);
+    for (i=0;i<steps;i=i+1) begin
+        #CLOCK_PERIOD;
+        for (j=0;j<4;j=j+1) begin // compute avg of each bit of adder sum
+            net_sum[j] <= net_sum[j] + b_out[j];
+        end
+        $fdisplay(test_data, "%d,%d,%d,%d,%d",$time, a_out, b_out, sum_out, overflow);
+    end
+    // $display("Percentage of cycles where bit was equal to 1:");
+    // $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
+    // $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
+    
+
     // // mode=2 to test subtraction
     // reset <=1; a <= 4; sum <= 4; I_0 <= 1; mode <= 2; #CLOCK_PERIOD;
     // reset <= 0; #CLOCK_PERIOD;

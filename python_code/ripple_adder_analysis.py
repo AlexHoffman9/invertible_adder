@@ -48,7 +48,7 @@ while start_index < rows:                           # iterate through tests
         plt.axis([0,steps, 0, 1])
 
         # Plot histogram of sum
-        sum_histogram = np.bincount(df.iloc[0:steps,s_index], minlength=16)
+        sum_histogram = np.bincount(df.iloc[start_index:start_index+steps,s_index], minlength=16)
         normalized_sum_histogram = np.divide(sum_histogram,steps)  # normalize to frequency 1
         # print(normalized_sum_histogram)
         plt.subplot(1,2,2)
@@ -56,10 +56,43 @@ while start_index < rows:                           # iterate through tests
         plt.title("Histogram of adder sum")
         plt.xlabel("Observed Sum")
         plt.ylabel("Frequency")
-        
+    elif mode==1:  # inverse additon mode. check if a+b floating, s fixed
+        a=df.iloc[start_index,a_index]; b=df.iloc[start_index,b_index]; s=df.iloc[start_index,s_index]
+        target = s
+        # check if a+b == sum
+        observed_sum = (df.iloc[start_index:start_index+steps,a_index] + df.iloc[start_index:start_index+steps,b_index])
+        equality_list = target==observed_sum
+        num_chunks = 10; chunk_size = int(np.floor(steps/num_chunks))
+        accuracy_list = []                                            # list of accuracy across batches of size chunk_size
+        for i in range(num_chunks):
+            accuracy_list.append(np.sum(equality_list[chunk_size*i:chunk_size*(i+1)])/chunk_size)
+        sum_correct = np.sum(equality_list)
+        # Figure for inv addition
+        fig=plt.figure()
+        fig.suptitle("Results for Inv. Addition A+B=S: S={}, I0={}".format(s,I_0))
+
+        # Plot accuracy over time
+        plt.subplot(1,2,1)
+        # print(np.arange(0,steps,chunk_size))
+        # print(accuracy_list)
+        plt.plot(np.arange(0,steps,chunk_size), accuracy_list)
+        plt.title("Inverse Addition accuracy over time")
+        plt.xlabel("Cycles")
+        plt.ylabel("Accuracy")
+        plt.axis([0,steps, 0, 1])
+
+        # Plot histogram of sum
+        sum_histogram = np.bincount(observed_sum, minlength=16)
+        # print(sum_histogram)
+        normalized_sum_histogram = np.divide(sum_histogram,steps)  # normalize to frequency 1
+        # print(normalized_sum_histogram)
+        plt.subplot(1,2,2)
+        plt.bar(range(len(normalized_sum_histogram)),normalized_sum_histogram)
+        plt.title("Histogram of A+B")
+        plt.xlabel("Observed A+B")
+        plt.ylabel("Frequency")
 
     elif mode==2:  # subtraction mode. Check b for accuracy
-        # print('h')
         a=df.iloc[start_index,a_index]; s=df.iloc[start_index,s_index]
         target = s-a
         if target < 0:
