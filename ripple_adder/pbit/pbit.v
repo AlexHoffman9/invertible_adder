@@ -9,7 +9,7 @@ W = {6'd1, 6'd1, 6'd1, 6'd1};       // weights for this pbit in s[3][2] format -
 
 input clk, reset, update_control;   // clk, reset, update_control==1 allows pbit to update its output, otherwise it holds
 input[N_NEIGHBORS-1:0] p_in;        // input p bits
-input [3:0] I_0;                    // unsigned scaling
+input [3:0] I_0;                    // unsigned scaling. fixed point [2][2]
 input [1:0] clamp_control;          // msb = clamp enable, lsb = clamped value
 output reg p_out;                   // output bit
 
@@ -70,7 +70,7 @@ parameter CLOCK_PERIOD = 20;
 integer i; integer sum = 0; integer steps = 100;
 initial 
 begin
-    reset <= 1; I_0 <= 4'd1; p_in <= 4'b1111; clamp_control <= 2'b00; update_control <= 1'b1;
+    reset <= 1; I_0 <= 4'd4; p_in <= 4'b1111; clamp_control <= 2'b00; update_control <= 1'b1;
     #CLOCK_PERIOD; reset <= 0;#CLOCK_PERIOD; reset <= 1;#CLOCK_PERIOD; reset <= 0;
     #CLOCK_PERIOD; #CLOCK_PERIOD; #CLOCK_PERIOD; #CLOCK_PERIOD; clamp_control <= 2'b10;
     #CLOCK_PERIOD; #CLOCK_PERIOD; #CLOCK_PERIOD; #CLOCK_PERIOD; clamp_control <= 2'b11;

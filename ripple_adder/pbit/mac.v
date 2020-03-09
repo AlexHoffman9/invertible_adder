@@ -7,7 +7,7 @@ localparam signed max_threshold = {1'b0,{WEIGHT_PRECISION-1{1'b1}}}; // sets thr
 localparam signed min_threshold = {1'b1,{WEIGHT_PRECISION-1{1'b0}}}; // assumes weight threshold == output threshold
 
 input [N_NEIGHBORS-1:0] p_in;   // input p bits
-input [3:0] I_0; // unsigned scaling
+input [3:0] I_0; // unsigned scaling. fixed point [2][2]
 output reg signed [WEIGHT_PRECISION-1:0] out;
 reg signed [WEIGHT_PRECISION-1:0] weighted_p[N_NEIGHBORS-1:0];
 reg signed [WEIGHT_PRECISION+3:0] weighted_sum;  // max 16 connections
@@ -37,7 +37,7 @@ begin
     end
 
     // scale with I_0
-    scaled_sum = $signed(weighted_sum * I_0);
+    scaled_sum = $signed(weighted_sum * I_0)>>>2; // multiply by scaling. scaled sum is 
 
     // Thresholding of scaled sum
     if (scaled_sum > max_threshold) begin
@@ -53,7 +53,7 @@ endmodule
 
 `timescale 1ns/1ps
 module mac_tb();
-localparam N_NEIGHBORS=4, WEIGHT_PRECISION=5, H=-5'd1, W={-5'd2, -5'd2, -5'd2, -5'd2};
+localparam N_NEIGHBORS=4, WEIGHT_PRECISION=5, H=5'd0, W={-5'd2, -5'd2, -5'd2, -5'd2};
 reg[N_NEIGHBORS-1:0] p_in;   // input p bits
 reg[3:0] I_0;
 wire[4:0] out;
@@ -62,10 +62,19 @@ mac#(N_NEIGHBORS, WEIGHT_PRECISION, H, W) dut(p_in, I_0, out);
 
 integer i;
 initial begin
-    p_in <= 4'b0000; I_0 <= 4'd2; #10;
+    p_in <= 4'b0000; I_0 <= 4'd1; #10;
     // for (i=0; i<=3; i = i + 1)  begin
     //     w[i] <= 6'd1;
     // end
+    #10; I_0 <= 4'd2;
+    #10; I_0 <= 4'd3;
+    #10; I_0 <= 4'd4;
+    #10; I_0 <= 4'd6;
+    #10; I_0 <= 4'd7;
+    #10; I_0 <= 4'd8;
+    #10; I_0 <= 4'd9;
+    #10; I_0 <= 4'd11;
+    #10; I_0 <= 4'd15;
     #10; p_in <= 4'b1010;
     #10; p_in <= 4'b1111;
     #10; p_in <= 4'b1011;
