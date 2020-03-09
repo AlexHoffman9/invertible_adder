@@ -19,6 +19,7 @@ while start_index < rows:                           # iterate through tests
     I_0 = df.iloc[start_index,df.columns.get_loc('OVF')]
     mode = int(df.iloc[start_index,df.columns.get_loc('Mode')])
     steps = int(df.iloc[start_index,df.columns.get_loc('Steps')])
+    tau = 2**(int(df.iloc[start_index,df.columns.get_loc('LogTau')]))
     # print(df.iloc[start_index,0:])
     # print(mode)
     if mode == 0:  # Addition mode. Check sum for accuracy
@@ -35,7 +36,7 @@ while start_index < rows:                           # iterate through tests
 
         # Figure for addition
         fig=plt.figure()
-        fig.suptitle("Results for Addition S=A+B: A={}, B={}, I0={}".format(a,b,I_0))
+        fig.suptitle("Results for Addition S=A+B: A={}, B={}, Annealing tau={}".format(a,b,tau))
 
         # Plot accuracy over time
         plt.subplot(1,2,1)
@@ -62,14 +63,14 @@ while start_index < rows:                           # iterate through tests
         # check if a+b == sum
         observed_sum = (df.iloc[start_index:start_index+steps,a_index] + df.iloc[start_index:start_index+steps,b_index])
         equality_list = target==observed_sum
-        num_chunks = 10; chunk_size = int(np.floor(steps/num_chunks))
+        num_chunks = 20; chunk_size = int(np.floor(steps/num_chunks))
         accuracy_list = []                                            # list of accuracy across batches of size chunk_size
         for i in range(num_chunks):
             accuracy_list.append(np.sum(equality_list[chunk_size*i:chunk_size*(i+1)])/chunk_size)
         sum_correct = np.sum(equality_list)
         # Figure for inv addition
         fig=plt.figure()
-        fig.suptitle("Results for Inv. Addition A+B=S: S={}, I0={}".format(s,I_0))
+        fig.suptitle("Results for Inv. Addition A+B=S: S={}, Annealing tau={}".format(s,tau))
 
         # Plot accuracy over time
         plt.subplot(1,2,1)
@@ -108,7 +109,7 @@ while start_index < rows:                           # iterate through tests
 
         # Figure for Subtraction
         fig=plt.figure()
-        fig.suptitle("Results for Subtraction B=S-A: A={}, S={}, I0={}".format(a,s,I_0))
+        fig.suptitle("Results for Subtraction B=S-A: A={}, S={}, Annealing tau={}".format(a,s,tau))
 
         # Plot accuracy over time
         plt.subplot(1,2,1)
