@@ -8,7 +8,7 @@ vlib work
 
 #vlog -sv "./inv_ripple_adder.sv"
 vlog "./inv_ripple_adder_annealed.v"
-#vlog "./inv_ripple_adder.v"
+vlog "./inv_ripple_adder.v"
 vlog "./annealer.v"
 vlog "./inv_full_adder.v"
 vlog "./update_sequencer.v"

@@ -12,37 +12,37 @@ a_index = df.columns.get_loc('A')
 b_index = df.columns.get_loc('B')
 s_index = df.columns.get_loc('S')
 ovf_index = df.columns.get_loc('OVF')
+num_chunks = 20
 
-# print(df.iloc[0:,df.columns.get_loc('Steps')])
 start_index = 0
 while start_index < rows:                           # iterate through tests 
-    I_0 = df.iloc[start_index,df.columns.get_loc('OVF')]
+    I_0 = df.iloc[start_index,df.columns.get_loc('I_0')]
     mode = int(df.iloc[start_index,df.columns.get_loc('Mode')])
     steps = int(df.iloc[start_index,df.columns.get_loc('Steps')])
     tau = 2**(int(df.iloc[start_index,df.columns.get_loc('LogTau')]))
-    # print(df.iloc[start_index,0:])
-    # print(mode)
+    update_mode = int(df.iloc[start_index,df.columns.get_loc('Update')])
+    update_string="sequential"
+    if update_mode:
+        update_string="parallel"
     if mode == 0:  # Addition mode. Check sum for accuracy
         # Adder Accuracy
         a=df.iloc[start_index,a_index]; b=df.iloc[start_index,b_index]
         target = (a+b)%16
         equality_list = target==df.iloc[start_index:start_index+steps,s_index]                   # boolean list of whether sum was correct
-        num_chunks = 10; chunk_size = int(np.floor(steps/num_chunks))
+        chunk_size = int(np.floor(steps/num_chunks))
+        print("n_chunks:,",num_chunks, ", chunk_size:", chunk_size, ", steps:", steps)
         accuracy_list = []                                            # list of accuracy across batches of size chunk_size
         for i in range(num_chunks):
             accuracy_list.append(np.sum(equality_list[chunk_size*i:chunk_size*(i+1)])/chunk_size)
         sum_correct = np.sum(equality_list)
-        # print(sum_correct/steps)
-
+        
         # Figure for addition
         fig=plt.figure()
-        fig.suptitle("Results for Addition S=A+B: A={}, B={}, Annealing tau={}".format(a,b,tau))
+        fig.suptitle("Results for Addition S=A+B: \nA={}, B={}, Annealing tau={}, {} updates".format(a,b,tau, update_string))
 
         # Plot accuracy over time
         plt.subplot(1,2,1)
-        # print(np.arange(0,steps,chunk_size))
-        # print(accuracy_list)
-        plt.plot(np.arange(0,steps,chunk_size), accuracy_list)
+        plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
         plt.title("Adder accuracy over time")
         plt.xlabel("Cycles")
         plt.ylabel("Accuracy")
@@ -63,20 +63,20 @@ while start_index < rows:                           # iterate through tests
         # check if a+b == sum
         observed_sum = (df.iloc[start_index:start_index+steps,a_index] + df.iloc[start_index:start_index+steps,b_index])
         equality_list = target==observed_sum
-        num_chunks = 20; chunk_size = int(np.floor(steps/num_chunks))
+        chunk_size = int(np.floor(steps/num_chunks))
         accuracy_list = []                                            # list of accuracy across batches of size chunk_size
         for i in range(num_chunks):
             accuracy_list.append(np.sum(equality_list[chunk_size*i:chunk_size*(i+1)])/chunk_size)
         sum_correct = np.sum(equality_list)
         # Figure for inv addition
         fig=plt.figure()
-        fig.suptitle("Results for Inv. Addition A+B=S: S={}, Annealing tau={}".format(s,tau))
+        fig.suptitle("Results for Inv. Addition A+B=S: \nS={}, Annealing tau={}, {} updates".format(s,tau,update_string))
 
         # Plot accuracy over time
         plt.subplot(1,2,1)
         # print(np.arange(0,steps,chunk_size))
         # print(accuracy_list)
-        plt.plot(np.arange(0,steps,chunk_size), accuracy_list)
+        plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
         plt.title("Inverse Addition accuracy over time")
         plt.xlabel("Cycles")
         plt.ylabel("Accuracy")
@@ -101,21 +101,22 @@ while start_index < rows:                           # iterate through tests
         # print(target)
         equality_list = target==df.iloc[start_index:start_index+steps,b_index]                   # boolean list of whether sum was correct
         # print(equality_list)
-        num_chunks = 10; chunk_size = int(np.floor(steps/num_chunks))
+        chunk_size = int(np.floor(steps/num_chunks))
         accuracy_list = []                                            # list of accuracy across batches of size chunk_size
         for i in range(num_chunks):
             accuracy_list.append(np.sum(equality_list[chunk_size*i:chunk_size*(i+1)])/chunk_size)
         sum_correct = np.sum(equality_list)
+        
 
         # Figure for Subtraction
         fig=plt.figure()
-        fig.suptitle("Results for Subtraction B=S-A: A={}, S={}, Annealing tau={}".format(a,s,tau))
+        fig.suptitle("Results for Subtraction B=S-A: \nA={}, S={}, Annealing tau={}, {} updates".format(a,s,tau,update_string))
 
         # Plot accuracy over time
         plt.subplot(1,2,1)
         # print(np.arange(0,steps,chunk_size))
         # print(accuracy_list)
-        plt.plot(np.arange(0,steps,chunk_size), accuracy_list)
+        plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
         plt.title("Subtraction accuracy over time")
         plt.xlabel("Cycles")
         plt.ylabel("Accuracy")

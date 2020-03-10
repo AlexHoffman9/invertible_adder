@@ -2,8 +2,8 @@
 // `include "uvm_pkg.sv" 
 // a, b sum inputs can be set to fix the input to the adder for forward or inverse logic
 // pbit_out contains the stochastic values of each bit in the network. One can extract sum from pbit_out[i][3] for each bit i, 
-module inv_ripple_adder(clk, reset, mode, I_0, a, b, sum, a_out, b_out, sum_out, overflow);
-input reset, clk;
+module inv_ripple_adder(clk, reset, mode, I_0, update_mode, a, b, sum, a_out, b_out, sum_out, overflow);
+input reset, clk, update_mode;
 input [1:0] mode;
 input [3:0] a, b, I_0, sum;
 output reg [3:0] a_out, b_out, sum_out;
@@ -68,7 +68,7 @@ end
 genvar i_gen;
 generate
 for (i_gen = 0; i_gen < 4; i_gen = i_gen + 1) begin: adders
-    inv_full_adder fa(.clk, .reset, .I_0, .a_clamp(a_clamp[i_gen][1:0]),
+    inv_full_adder fa(.clk, .reset, .I_0, .update_mode, .a_clamp(a_clamp[i_gen][1:0]),
     .b_clamp(b_clamp[i_gen][1:0]), 
     .cin_clamp(cin_clamp[i_gen][1:0]), 
     .s_clamp(s_clamp[i_gen][1:0]), 
@@ -82,14 +82,14 @@ endmodule
 
 `timescale 1ns/1ps
 module inv_ripple_adder_tb();
-reg reset, clk;
+reg reset, clk, update_mode;
 reg [1:0] mode;
 reg [3:0] a, b, sum;
 reg [3:0] I_0;
 wire [3:0] a_out, b_out, sum_out;
 wire overflow;
 
-inv_ripple_adder dut(.clk, .reset, .mode, .I_0, .a, .b, .sum, .a_out, .b_out, .sum_out, .overflow);
+inv_ripple_adder dut(.clk, .reset, .mode, .I_0, .update_mode, .a, .b, .sum, .a_out, .b_out, .sum_out, .overflow);
 
 parameter CLOCK_PERIOD = 2;
 initial // Clock setUp
@@ -112,7 +112,7 @@ begin
     $fdisplay(test_data, "time,A,B,S,OVF,I0,Mode,Steps");
 
     // mode=0 to test forward logic
-    reset <=1; a <= 1; b <= 7; I_0 <= 4; mode <= 0; #CLOCK_PERIOD;
+    reset <=1; update_mode<=0; a <= 1; b <= 7; I_0 <= 4; mode <= 0; #CLOCK_PERIOD;
     reset <= 0; #CLOCK_PERIOD;
     for (i=0;i<4;i=i+1) begin
         net_sum[i] = 0;

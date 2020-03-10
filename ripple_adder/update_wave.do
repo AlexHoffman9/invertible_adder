@@ -2,6 +2,7 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate /update_sequencer_tb/clk
 add wave -noupdate /update_sequencer_tb/reset
+add wave -noupdate /update_sequencer_tb/update_mode
 add wave -noupdate -radix binary /update_sequencer_tb/update_out
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {172905 ps} 0}
@@ -20,4 +21,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {169184 ps} {233184 ps}
+WaveRestoreZoom {279200 ps} {343200 ps}

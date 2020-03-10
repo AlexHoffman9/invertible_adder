@@ -3,8 +3,8 @@
 // clamp inputs control which bits are fixed inputs (_clamp=2'b1x), outputs (_clamp=2'b0x)
 // a, b, Cin, Cout, S
 `include "pbit/pbit.v"
-module inv_full_adder(clk, reset, I_0, a_clamp, b_clamp, cin_clamp, s_clamp, cout_clamp, p_bits);
-input clk, reset;
+module inv_full_adder(clk, reset, I_0, update_mode, a_clamp, b_clamp, cin_clamp, s_clamp, cout_clamp, p_bits);
+input clk, reset, update_mode;
 input [1:0] a_clamp, b_clamp, cin_clamp, s_clamp, cout_clamp;
 input [3:0] I_0;
 output [4:0] p_bits;
@@ -41,17 +41,17 @@ pbit #(32'ha34980df, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd8, 6'd8, 6'
 cout(.clk, .reset, .p_in(p_bits[3:0]), .I_0, .update_control(update_control[4]), .clamp_control(cout_clamp), .p_out(p_bits[4]));
 
 // update sequencer
-update_sequencer #(5) updater(.clk, .reset, .update_out(update_control));
+update_sequencer #(5) updater(.clk, .reset, .update_mode, .update_out(update_control));
 endmodule
 
 `timescale 1ns/1ps
 module inv_full_adder_tb();
-reg clk, reset;
+reg clk, reset, update_mode;
 reg [1:0] a_clamp, b_clamp, cin_clamp, s_clamp, cout_clamp;
 reg [3:0] I_0;
 wire [4:0] p_bits;
 
-inv_full_adder dut(.clk, .reset, .I_0, .a_clamp, .b_clamp, .cin_clamp, .s_clamp, .cout_clamp, .p_bits);
+inv_full_adder dut(.clk, .reset, .I_0, .update_mode, .a_clamp, .b_clamp, .cin_clamp, .s_clamp, .cout_clamp, .p_bits);
 
 parameter CLOCK_PERIOD = 20;
 initial // Clock setUp
@@ -79,7 +79,7 @@ begin
     // inverse logic: fixed sum and cout (carry propagates from cout to cin)
     $display("Inverted logic results:");
     for (i = 0; i <= 3; i = i + 1) begin
-        reset <= 1'b1; a_clamp = 2'b01; b_clamp <= 2'b01; cin_clamp <= 2'b01; s_clamp <= 2'b10; cout_clamp <= 2'b10; I_0<=4'd1; #CLOCK_PERIOD;
+        reset <= 1'b1; update_mode<=0; a_clamp = 2'b01; b_clamp <= 2'b01; cin_clamp <= 2'b01; s_clamp <= 2'b10; cout_clamp <= 2'b10; I_0<=4'd1; #CLOCK_PERIOD;
         s_clamp[0] <= i[1]; cout_clamp[0] <= i[0];
         #CLOCK_PERIOD; reset <= 1'b0;
         sum_a=0; sum_b=0; sum_cin = 0;
@@ -90,7 +90,7 @@ begin
             sum_cin = sum_cin + p_bits[2];
         end
         $display("S, Cout = %b: average A = %f, B = %f, Cin = %f after %d cycles", {s_clamp[0],cout_clamp[0]}, sum_a*1.0/steps, sum_b*1.0/steps, sum_cin*1.0/steps, steps);
-    end  
+    end
 
     // Subtraction: fixed a,sum, cin (carry propagates from cout to cin)
     $display("");
