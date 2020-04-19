@@ -7,12 +7,12 @@ vlib work
 #vlog -sv "./inv_ripple_adder.sv" +incdir+C:\Modeltech_pe_edu_10.4a\uvm-1.2\Accellera-1800.2-2017-1.0\1800.2-2017-1.0\src +define+UVM_CMDLINE_NO_DPI +define+UVM_REGEX_NO_DPI +define+UVM_NO_DPI
 
 #vlog -sv "./inv_ripple_adder.sv"
-vlog "./inv_ripple_adder_annealed.v"
-vlog "./inv_ripple_adder.v"
-vlog "./annealer.v"
-vlog "./inv_full_adder.v"
-vlog "./update_sequencer.v"
 vlog "./pbit/*.v"
+vlog "./annealer.v"
+vlog "./update_sequencer.v"
+vlog "./inv_full_adder.v"
+vlog "./inv_ripple_adder.v"
+vlog "./inv_ripple_adder_annealed.v"
 
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the

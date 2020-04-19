@@ -4,12 +4,12 @@ vlib work
 # Compile Verilog
 #     All Verilog files that are part of this design should have
 #     their own "vlog" line below.
-vlog "./prng_32.v"
-vlog "./prng_32_testbench.v"
+vlog "./prng_8.v"
+#vlog "./prng_32_testbench.v"
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the
 #     testbench module you want to execute.
-vsim -voptargs="+acc" -t 1ps -lib work prng_32_testbench
+vsim -voptargs="+acc" -t 1ps -lib work prng_8_tb
 
 # Source the wave do file
 #     This should be the file that sets up the signal window for

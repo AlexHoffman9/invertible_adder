@@ -4,6 +4,7 @@
 // a, b, Cin, Cout, S
 `include "pbit/pbit.v"
 module inv_full_adder(clk, reset, I_0, update_mode, a_clamp, b_clamp, cin_clamp, s_clamp, cout_clamp, p_bits);
+parameter seed_offset=0;
 input clk, reset, update_mode;
 input [1:0] a_clamp, b_clamp, cin_clamp, s_clamp, cout_clamp;
 input [3:0] I_0;
@@ -25,19 +26,19 @@ localparam N_NEIGHBORS = 4, WEIGHT_PRECISION = 6, SEED = 32'h48390184;
 // +1+1+1 0−2
 // +2+2+2−2 0
 
-pbit #(32'h45bc3a97, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}) 
+pbit #(32'h45bc3a97+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 32) 
 a(.clk, .reset, .p_in(p_bits[4:1]), .I_0, .update_control(update_control[0]), .clamp_control(a_clamp), .p_out(p_bits[0]));
 
-pbit #(32'h876b1c36, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4})
+pbit #(32'h876b1c36+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 32)
 b(.clk, .reset, .p_in({p_bits[4:2],p_bits[0]}), .I_0, .update_control(update_control[1]), .clamp_control(b_clamp), .p_out(p_bits[1]));
 
-pbit #(32'h48390184, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}) 
+pbit #(32'h48390184+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 32) 
 cin(.clk, .reset, .p_in({p_bits[4:3], p_bits[1:0]}), .I_0, .update_control(update_control[2]), .clamp_control(cin_clamp), .p_out(p_bits[2]));
 
-pbit #(32'h86b827f4, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd4, 6'd4, 6'd4}) 
+pbit #(32'h86b827f4+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd4, 6'd4, 6'd4}, 32) 
 s(.clk, .reset, .p_in({p_bits[4], p_bits[2:0]}), .I_0, .update_control(update_control[3]), .clamp_control(s_clamp), .p_out(p_bits[3]));
 
-pbit #(32'ha34980df, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd8, 6'd8, 6'd8}) 
+pbit #(32'ha34980df+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd8, 6'd8, 6'd8}, 32) 
 cout(.clk, .reset, .p_in(p_bits[3:0]), .I_0, .update_control(update_control[4]), .clamp_control(cout_clamp), .p_out(p_bits[4]));
 
 // update sequencer
@@ -79,7 +80,7 @@ begin
     // inverse logic: fixed sum and cout (carry propagates from cout to cin)
     $display("Inverted logic results:");
     for (i = 0; i <= 3; i = i + 1) begin
-        reset <= 1'b1; update_mode<=0; a_clamp = 2'b01; b_clamp <= 2'b01; cin_clamp <= 2'b01; s_clamp <= 2'b10; cout_clamp <= 2'b10; I_0<=4'd1; #CLOCK_PERIOD;
+        reset <= 1'b1; update_mode<=0; a_clamp = 2'b01; b_clamp <= 2'b01; cin_clamp <= 2'b01; s_clamp <= 2'b10; cout_clamp <= 2'b10; I_0<=4'd4; #CLOCK_PERIOD;
         s_clamp[0] <= i[1]; cout_clamp[0] <= i[0];
         #CLOCK_PERIOD; reset <= 1'b0;
         sum_a=0; sum_b=0; sum_cin = 0;
@@ -96,7 +97,7 @@ begin
     $display("");
     $display("Subtraction results:");
     for (i = 0; i <= 7; i = i + 1) begin
-        reset <= 1'b1; a_clamp = 2'b11; b_clamp <= 2'b01; cin_clamp <= 2'b11; s_clamp <= 2'b10; cout_clamp <= 2'b00; I_0<=4'd1; #CLOCK_PERIOD;
+        reset <= 1'b1; a_clamp = 2'b11; b_clamp <= 2'b01; cin_clamp <= 2'b11; s_clamp <= 2'b10; cout_clamp <= 2'b00; #CLOCK_PERIOD;
         a_clamp[0] <= i[2]; s_clamp[0] <= i[1]; cin_clamp[0] <= i[0];
         #CLOCK_PERIOD; reset <= 1'b0;
         sum_a=0; sum_b=0; sum_cout = 0;
@@ -114,7 +115,7 @@ begin
     $display("");
     $display("Forward logic results: ");
     for (i = 0; i <= 7; i = i + 1) begin
-        reset <= 1'b1; a_clamp = 2'b11; b_clamp <= 2'b11; cin_clamp <= 2'b11; s_clamp <= 2'b00; cout_clamp <= 2'b00; I_0<=4'd1; #CLOCK_PERIOD;
+        reset <= 1'b1; a_clamp = 2'b11; b_clamp <= 2'b11; cin_clamp <= 2'b11; s_clamp <= 2'b00; cout_clamp <= 2'b00; #CLOCK_PERIOD;
         a_clamp[0] <= i[2]; b_clamp[0] <= i[1]; cin_clamp[0] = i[0];
         #CLOCK_PERIOD; reset <= 1'b0;
         sum_s=0; sum_cout=0;

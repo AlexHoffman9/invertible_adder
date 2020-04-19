@@ -4,8 +4,11 @@ vlib work
 # Compile Verilog
 #     All Verilog files that are part of this design should have
 #     their own "vlog" line below.
-vlog "./inv_full_adder.v"
+# vlog "./pbit/mac.v"
+# vlog "./pbit/tanh.v"
+# vlog "./pbit/prng_32.v"
 vlog "./pbit/*.v"
+vlog "./inv_full_adder.v"
 
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the

@@ -23,11 +23,6 @@ always@(*) begin
         end else begin
             cin_clamp[i][0] = 1'b0;
         end
-        // if (i<3) begin
-        //     cout_clamp[i][0] = pbit_out[i+1][2]; // fixes carry out to carry in, except for top bit.  Let's try removing this 
-        // end else begin
-        //     cout_clamp[i][0] = 1'bx; // carry out of top bit is not fixed
-        // end
         cout_clamp[i][0] = 1'bx; // carry out bit will never be fixed
     end
 
@@ -39,18 +34,7 @@ always@(*) begin
             {a_clamp[i][1], b_clamp[i][1], cin_clamp[i][1]} = 3'b111;
             {s_clamp[i][1], cout_clamp[i][1]} = 2'b00;
         end
-    end
-    //  else if (mode == 1) begin // inverse mode, sum and cout are fixed, a,b,cin are floating
-    //     for (i=0;i<=3;i=i+1) begin
-    //         {a_clamp[i][1], b_clamp[i][1], cin_clamp[i][1]} = 3'b000;
-    //         if (i<3) begin
-    //             {s_clamp[i][1], cout_clamp[i][1]} = 2'b11;
-    //         end else begin
-    //             {s_clamp[i][1], cout_clamp[i][1]} = 2'b10;
-    //         end
-    //     end
-    // end 
-    else if (mode == 1) begin // inverse mode, sum, cin fixed.  a,b,couts] are floating
+    end else if (mode == 1) begin // inverse mode, sum, cin fixed.  a,b,couts] are floating
         for (i=0;i<=3;i=i+1) begin
             {a_clamp[i][1], b_clamp[i][1], cout_clamp[i][1]} = 3'b000;
             {s_clamp[i][1], cin_clamp[i][1]} = 2'b11;
@@ -68,7 +52,7 @@ end
 genvar i_gen;
 generate
 for (i_gen = 0; i_gen < 4; i_gen = i_gen + 1) begin: adders
-    inv_full_adder fa(.clk, .reset, .I_0, .update_mode, .a_clamp(a_clamp[i_gen][1:0]),
+    inv_full_adder#(i_gen) fa(.clk, .reset, .I_0, .update_mode, .a_clamp(a_clamp[i_gen][1:0]),
     .b_clamp(b_clamp[i_gen][1:0]), 
     .cin_clamp(cin_clamp[i_gen][1:0]), 
     .s_clamp(s_clamp[i_gen][1:0]), 

@@ -1,11 +1,10 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate /prng_32_testbench/dut/clk
-add wave -noupdate /prng_32_testbench/dut/reset
-add wave -noupdate /prng_32_testbench/dut/seed
-add wave -noupdate /prng_32_testbench/dut/lsfr
-add wave -noupdate /prng_32_testbench/dut/feedback
-add wave -noupdate /prng_32_testbench/out
+add wave -noupdate /prng_8_tb/clk
+add wave -noupdate /prng_8_tb/reset
+add wave -noupdate /prng_8_tb/seed
+add wave -noupdate /prng_8_tb/i
+add wave -noupdate /prng_8_tb/out
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {82 ps} 0}
 quietly wave cursor active 1
@@ -23,4 +22,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {1156800 ps} {1412800 ps}
+WaveRestoreZoom {4976800 ps} {5232800 ps}

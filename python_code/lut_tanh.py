@@ -45,4 +45,3 @@ print("sum is: ", sum)
 print("average val is: ", sum/steps)
 print('expected average val tanh(', tan_index/4, '): ', np.tanh(tan_index/4))
 
-# print(np.tanh(4/4))

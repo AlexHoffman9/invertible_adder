@@ -1,40 +1,42 @@
 import numpy as np
 file1 = open("lut_tanh_inv.txt","w")
 # file1.write("hi")
-lut_size = 8
-tans = [0.0]*lut_size
+LUT_SIZE = 8
+tans = [0.0]*LUT_SIZE
 sum=0
-bit_precision=32
+BIT_PRECISION=32
 arctanh = np.double(np.arctanh(2**(-1)))
 # print(arctanh)
 
 # print(arctanh)
 # scale up to a 32 bit signed integer by multiplying floating point num by 2^31. msb becomes sign bit, msb-1 is .5 bit, msb-2 is .25 bit...
 # now we can treat 32 bits as s[0][31] fixed point
-for i in range(1,lut_size-2):
-    arctanh = np.double(np.arctanh(2**(-i)))
+for i in range(-2,LUT_SIZE-2):
+    if i <=0:
+        arctanh = np.double(np.arctanh(1-2**(i-2)))
+    else:
+        arctanh = np.double(np.arctanh(2**(-i)))
 
     # print(arctanh)
     # scale up to a 32 bit signed integer by multiplying floating point num by 2^30. msb becomes sign bit, msb-1 is 1 bit, msb-2 is .5 bit.... range of -2 to 1.999
-    # cordic will add these tan numbers so we need to leave an extra bit to reach 
+    # cordic will add these tan numbers so we need to leave an extra bit to reach range of 2
     # now we can treat 32 bits as s[1][30] fixed point
-    scaled = np.uint32(arctanh*2**(bit_precision-2))
-    tans[i] = scaled # move decimal place 31 to the right
-    # print("{0:=032b}".format(scaled))
-for i in range(-2,1):
-    # print(1-2**(i-2))
-    arctanh = np.double(np.arctanh(1-2**(i-2)))
-    scaled = np.uint32(arctanh*2**(bit_precision-2)) # move decimal place 30 to the right
-    tans[i%lut_size] = scaled 
+    if BIT_PRECISION==32:
+        scaled = np.uint32(arctanh*2**(BIT_PRECISION-2))
+    elif BIT_PRECISION==16:
+        scaled = np.uint32(arctanh*2**(BIT_PRECISION-2))
+    else:
+        scaled = np.uint8(arctanh*2**(BIT_PRECISION-2))
+    tans[i%LUT_SIZE] = scaled 
 
-for case in range(lut_size): # the negative i values
-    line = "4'd"+str(case)+": inv_tanh = "+"{}'d".format(bit_precision)+str(tans[case])+";\n"
-    line = "4'd"+str(case)+": inv_tanh = "+"{}'b".format(bit_precision)+"{0:=032b}".format(tans[case])+";\n"
+for case in range(LUT_SIZE): # the negative i values
+    line = "4'd"+str(case)+": inv_tanh = "+"{}'d".format(BIT_PRECISION)+str(tans[case])+";\n"
+    line = "4'd"+str(case)+": inv_tanh = "+"{}'b".format(BIT_PRECISION)+("{0:=0"+str(BIT_PRECISION)+"b}").format(tans[case])+";\n"
     # bin_string = format(case, '0{}b'.format(bits))
     file1.write(line)
 
 # for case in range(1, 14): # positive i values
-#     line = "4'd"+str(case)+": inv_tanh = "+"{}'d".format(bit_precision)+str(tans[case])+";\n"
+#     line = "4'd"+str(case)+": inv_tanh = "+"{}'d".format(BIT_PRECISION)+str(tans[case])+";\n"
 #     # bin_string = format(case, '0{}b'.format(bits))
 #     file1.write(line)
 #     # print(line)
