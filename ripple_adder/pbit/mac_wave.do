@@ -1,15 +1,14 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate /mac_tb/p_in
-add wave -noupdate /mac_tb/w
-add wave -noupdate -radix decimal /mac_tb/h
 add wave -noupdate -radix decimal /mac_tb/dut/weighted_p
 add wave -noupdate -radix decimal /mac_tb/dut/weighted_sum
-add wave -noupdate -radix decimal /mac_tb/I_0
+add wave -noupdate -radix hexadecimal /mac_tb/I_0
+add wave -noupdate -radix decimal /mac_tb/dut/scaled_sum_preshift
 add wave -noupdate -radix decimal /mac_tb/dut/scaled_sum
-add wave -noupdate -radix decimal /mac_tb/out
+add wave -noupdate -radix decimal -childformat {{{/mac_tb/out[5]} -radix decimal} {{/mac_tb/out[4]} -radix decimal} {{/mac_tb/out[3]} -radix decimal} {{/mac_tb/out[2]} -radix decimal} {{/mac_tb/out[1]} -radix decimal} {{/mac_tb/out[0]} -radix decimal}} -subitemconfig {{/mac_tb/out[5]} {-height 15 -radix decimal} {/mac_tb/out[4]} {-height 15 -radix decimal} {/mac_tb/out[3]} {-height 15 -radix decimal} {/mac_tb/out[2]} {-height 15 -radix decimal} {/mac_tb/out[1]} {-height 15 -radix decimal} {/mac_tb/out[0]} {-height 15 -radix decimal}} /mac_tb/out
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {8000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {10431 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
