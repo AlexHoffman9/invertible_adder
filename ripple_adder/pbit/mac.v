@@ -56,7 +56,8 @@ endmodule
 
 `timescale 1ns/1ps
 module mac_tb();
-localparam N_NEIGHBORS=4, WEIGHT_PRECISION=3, H=3'd3, W={3'd3,3'd3,3'd3,3'd3}; //W={-3'd4,-3'd4,-3'd4,-3'd4};
+// localparam N_NEIGHBORS=4, WEIGHT_PRECISION=3, H=3'd3, W={3'd3,3'd3,3'd3,3'd3}; //W={-3'd4,-3'd4,-3'd4,-3'd4};
+localparam N_NEIGHBORS=4, WEIGHT_PRECISION=6, H=6'd3, W={6'd3,6'd3,6'd3,6'd3};
 reg[N_NEIGHBORS-1:0] p_in;   // input p bits
 reg[3:0] I_0;
 wire[5:0] out;

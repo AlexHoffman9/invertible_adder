@@ -58,7 +58,7 @@ localparam BITS=8;
 reg signed[5:0] in;  // 6 bits 2's complement fixed point. s[3][2] format
 wire signed[BITS-1:0] out; // 32 bit 2's comp output -1 to (almost) 1 range
 
-fast_tanh#(BITS) dut(.in, .out);
+fast_tanh#(BITS) dut(in, out);
 
 integer i=0;
 integer test_data;

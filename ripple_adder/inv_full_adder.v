@@ -14,7 +14,7 @@ wire [4:0] update_control; // update sequencer output
 // temperature (constant for now)
 // assign I_0 = 4'd1;
 
-localparam N_NEIGHBORS = 4, WEIGHT_PRECISION = 6, SEED = 32'h48390184; 
+localparam N_NEIGHBORS = 4, WEIGHT_PRECISION = 6, SEED = 8'h48; 
 // three pbits
 // weights multiplied by 4 because of 2 fractional bits
 // weights = weights in row ignoring the zero weight applied to onesself. {} list starts from right side of J matrix (looks mirrored)
@@ -26,19 +26,19 @@ localparam N_NEIGHBORS = 4, WEIGHT_PRECISION = 6, SEED = 32'h48390184;
 // +1+1+1 0−2
 // +2+2+2−2 0
 
-pbit #(32'h45bc3a97+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 32) 
+pbit #(8'h97+seed_offset[7:0], N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 8) 
 a(.clk, .reset, .p_in(p_bits[4:1]), .I_0, .update_control(update_control[0]), .clamp_control(a_clamp), .p_out(p_bits[0]));
 
-pbit #(32'h876b1c36+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 32)
+pbit #(8'h36+seed_offset[7:0], N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 8)
 b(.clk, .reset, .p_in({p_bits[4:2],p_bits[0]}), .I_0, .update_control(update_control[1]), .clamp_control(b_clamp), .p_out(p_bits[1]));
 
-pbit #(32'h48390184+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 32) 
+pbit #(8'h84+seed_offset[7:0], N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {6'd8, 6'd4, -6'd4, -6'd4}, 8) 
 cin(.clk, .reset, .p_in({p_bits[4:3], p_bits[1:0]}), .I_0, .update_control(update_control[2]), .clamp_control(cin_clamp), .p_out(p_bits[2]));
 
-pbit #(32'h86b827f4+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd4, 6'd4, 6'd4}, 32) 
+pbit #(8'hf4+seed_offset[7:0], N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd4, 6'd4, 6'd4}, 8) 
 s(.clk, .reset, .p_in({p_bits[4], p_bits[2:0]}), .I_0, .update_control(update_control[3]), .clamp_control(s_clamp), .p_out(p_bits[3]));
 
-pbit #(32'ha34980df+seed_offset, N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd8, 6'd8, 6'd8}, 32) 
+pbit #(8'hdf+seed_offset[7:0], N_NEIGHBORS, WEIGHT_PRECISION, 6'd0, {-6'd8, 6'd8, 6'd8, 6'd8}, 8) 
 cout(.clk, .reset, .p_in(p_bits[3:0]), .I_0, .update_control(update_control[4]), .clamp_control(cout_clamp), .p_out(p_bits[4]));
 
 // update sequencer
