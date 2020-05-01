@@ -37,26 +37,38 @@ while start_index < rows:                           # iterate through tests
         sum_correct = np.sum(equality_list)
         
         # Figure for addition
-        fig=plt.figure()
-        fig.suptitle("Results for Addition S=A+B: \nA={}, B={}, Annealing tau={}, {} updates".format(a,b,tau, update_string))
+        # fig=plt.figure()
+        # fig.suptitle("Results for Addition S=A+B: \nA={}, B={}, Annealing tau={}, {} updates".format(a,b,tau, update_string))
 
         # Plot accuracy over time
-        plt.subplot(1,2,1)
-        plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
-        plt.title("Adder accuracy over time")
-        plt.xlabel("Cycles")
-        plt.ylabel("Accuracy")
-        plt.axis([0,steps, 0, 1])
-
+        # plt.subplot(3,1,1)
+        # plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
+        # plt.title("Adder accuracy over time")
+        # plt.xlabel("Cycles")
+        # plt.ylabel("Accuracy")
+        # plt.axis([0,steps, 0, 1])
+        
+        fig=plt.figure()
+        plt.subplot(2,1,1)
         # Plot histogram of sum
         sum_histogram = np.bincount(df.iloc[start_index:start_index+steps,s_index], minlength=16)
         normalized_sum_histogram = np.divide(sum_histogram,steps)  # normalize to frequency 1
         # print(normalized_sum_histogram)
-        plt.subplot(1,2,2)
+        # plt.subplot(1,3,2)
         plt.bar(range(16), normalized_sum_histogram)
-        plt.title("Histogram of adder sum")
-        plt.xlabel("Observed Sum")
+        # plt.title("Histogram of adder sum")
+        plt.xlabel("S")
         plt.ylabel("Frequency")
+
+        # time series
+        # fig=plt.figure()
+        plt.subplot(2,1,2)
+        s = np.array(df.iloc[start_index:start_index+steps,s_index])
+        t = range(steps)
+        # plt.subplot(1,3,3)
+        plt.scatter(t,s,4)
+        plt.ylabel("S")
+        plt.xlabel("Time (Clock cycles)")
     elif mode==1:  # inverse additon mode. check if a+b floating, s fixed
         a=df.iloc[start_index,a_index]; b=df.iloc[start_index,b_index]; s=df.iloc[start_index,s_index]
         target = s
@@ -69,29 +81,40 @@ while start_index < rows:                           # iterate through tests
             accuracy_list.append(np.sum(equality_list[chunk_size*i:chunk_size*(i+1)])/chunk_size)
         sum_correct = np.sum(equality_list)
         # Figure for inv addition
-        fig=plt.figure()
-        fig.suptitle("Results for Inv. Addition A+B=S: \nS={}, Annealing tau={}, {} updates".format(s,tau,update_string))
+        # fig.suptitle("Results for Inv. Addition A+B=S: \nS={}, Annealing tau={}, {} updates".format(s,tau,update_string))
 
         # Plot accuracy over time
-        plt.subplot(1,2,1)
-        # print(np.arange(0,steps,chunk_size))
-        # print(accuracy_list)
-        plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
-        plt.title("Inverse Addition accuracy over time")
-        plt.xlabel("Cycles")
-        plt.ylabel("Accuracy")
-        plt.axis([0,steps, 0, 1])
+        # plt.subplot(1,2,1)
+        # plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
+        # plt.title("Inverse Addition accuracy over time")
+        # plt.xlabel("Cycles")
+        # plt.ylabel("Accuracy")
+        # plt.axis([0,steps, 0, 1])
 
         # Plot histogram of sum
+        plt.figure()
+        plt.subplot(3,1,1)
         sum_histogram = np.bincount(observed_sum, minlength=16)
-        # print(sum_histogram)
         normalized_sum_histogram = np.divide(sum_histogram,steps)  # normalize to frequency 1
-        # print(normalized_sum_histogram)
-        plt.subplot(1,2,2)
+        # plt.subplot(1,2,2)
         plt.bar(range(len(normalized_sum_histogram)),normalized_sum_histogram)
-        plt.title("Histogram of A+B")
+        # plt.title("Histogram of A+B")
         plt.xlabel("Observed A+B")
         plt.ylabel("Frequency")
+
+        # time series
+        # plt.figure()
+        plt.subplot(3,1,2)
+        a_vals = df.iloc[start_index:start_index+steps,a_index]
+        b_vals = df.iloc[start_index:start_index+steps,b_index]
+        t = range(steps)
+        plt.scatter(t,a_vals,4)
+        plt.ylabel("A")
+        plt.xlabel("Time (Clock cycles)")
+        plt.subplot(3,1,3)
+        plt.scatter(t,b_vals,4)
+        plt.ylabel("B")
+        plt.xlabel("Time (Clock cycles)")
 
     elif mode==2:  # subtraction mode. Check b for accuracy
         a=df.iloc[start_index,a_index]; s=df.iloc[start_index,s_index]
@@ -110,28 +133,34 @@ while start_index < rows:                           # iterate through tests
 
         # Figure for Subtraction
         fig=plt.figure()
-        fig.suptitle("Results for Subtraction B=S-A: \nA={}, S={}, Annealing tau={}, {} updates".format(a,s,tau,update_string))
+        plt.subplot(2,1,1)
+        # fig.suptitle("Results for Subtraction B=S-A: \nA={}, S={}, Annealing tau={}, {} updates".format(a,s,tau,update_string))
 
         # Plot accuracy over time
-        plt.subplot(1,2,1)
-        # print(np.arange(0,steps,chunk_size))
-        # print(accuracy_list)
-        plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
-        plt.title("Subtraction accuracy over time")
-        plt.xlabel("Cycles")
-        plt.ylabel("Accuracy")
-        plt.axis([0,steps, 0, 1])
+        # plt.subplot(1,2,1)
+        # plt.plot(np.arange(0,chunk_size*num_chunks,chunk_size), accuracy_list)
+        # plt.title("Subtraction accuracy over time")
+        # plt.xlabel("Cycles")
+        # plt.ylabel("Accuracy")
+        # plt.axis([0,steps, 0, 1])
 
         # Plot histogram of sum
         sum_histogram = np.bincount(df.iloc[start_index:start_index+steps,b_index], minlength=16)
-        # print(sum_histogram)
         normalized_sum_histogram = np.divide(sum_histogram,steps)  # normalize to frequency 1
-        # print(normalized_sum_histogram)
-        plt.subplot(1,2,2)
+        # plt.subplot(1,2,2)
         plt.bar(range(16), normalized_sum_histogram)
-        plt.title("Histogram of B=S-A")
-        plt.xlabel("Observed B")
+        # plt.title("Histogram of B=S-A")
+        plt.xlabel("B")
         plt.ylabel("Frequency")
+
+        # time series
+        b_vals =df.iloc[start_index:start_index+steps,b_index]
+        t = range(steps)
+        plt.subplot(2,1,2)
+        plt.scatter(t,b_vals,4)
+        plt.ylabel('B')
+        plt.xlabel('Time (Clock cycles)')
+
 
     start_index += steps+1
     # print(start_index)

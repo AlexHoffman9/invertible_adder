@@ -35,7 +35,7 @@ begin
 end
 
 // reg[3:0] inputs = 4'b000;
-integer i; integer j; integer steps = 1000; integer sum_a, sum_b, sum_cin, sum_cout, sum_s; integer net_sum[3:0];
+integer i; integer j; integer steps = 256; integer sum_a, sum_b, sum_cin, sum_cout, sum_s; integer net_sum[3:0];
 integer test_data; integer offset=0;
 
 task RUN_TEST;
@@ -72,59 +72,108 @@ begin
     end
     $fdisplay(test_data, "time,A,B,S,OVF,I_0,Mode,Steps,LogTau,Update");
 
+
     // mode=0 to test forward logic parallel
-    reset <=1; update_mode<=1; a <= 1; b <= 7; mode <= 0; I_min<=4'b0010; I_max<=4'b1111; log_tau<=8; #CLOCK_PERIOD;
+    reset <=1; update_mode<=1; a <= 1; b <= 7; mode <= 0; I_min<=4'b0010; I_max<=4'b1111; log_tau<=6; #CLOCK_PERIOD;
     reset <= 0; #CLOCK_PERIOD;
     // start task
-    // RUN_TEST;
+    RUN_TEST;
     $display("Percentage of cycles where bit was equal to 1:");
     $display("A=%d,B=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, b, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
     $display("Expected bit averages: %b.  Results: %b", a+b, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
     
-    
     // mode=0 to test forward logic sequential
     reset <=1; update_mode<=0; a <= 1; b <= 7; mode <= 0; #CLOCK_PERIOD;
     reset <= 0; #CLOCK_PERIOD;
-    // RUN_TEST;
+    RUN_TEST;
     $display("Percentage of cycles where bit was equal to 1:");
     $display("A=%d,B=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, b, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
     $display("Expected bit averages: %b.  Results: %b", a+b, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
 
 
     $display("\nSubtraction: b=s-a");
-    // mode=2 to test subtraction
-    reset <=1;update_mode<=1; a <= 3; sum <= 12; mode <= 2; #CLOCK_PERIOD;
-    reset <= 0; #CLOCK_PERIOD;
-    // RUN_TEST;
-    $display("Percentage of cycles where bit was equal to 1:");
-    $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
-    $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
-    
-    // mode=2 to test subtraction
-    reset <=1; update_mode<=0; a <= 3; sum <= 12; mode <= 2; #CLOCK_PERIOD;
+    // mode=2 to test subtraction parallel
+    reset <=1;update_mode<=1; a <= 1; sum <= 8; mode <= 2; #CLOCK_PERIOD;
     reset <= 0; #CLOCK_PERIOD;
     RUN_TEST;
     $display("Percentage of cycles where bit was equal to 1:");
     $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
     $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
     
+    // mode=2 to test subtraction sequential
+    reset <=1; update_mode<=0; a <= 1; sum <= 8; mode <= 2; #CLOCK_PERIOD;
+    reset <= 0; #CLOCK_PERIOD;
+    RUN_TEST;
+    $display("Percentage of cycles where bit was equal to 1:");
+    $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
+    $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
 
 
     $display("\nInverse Sum: a+b=s");
-    // mode=1 to test inverse sum
-    reset <=1; update_mode<=1; sum <= 12; mode <= 1; #CLOCK_PERIOD;
+    // mode=1 to test inverse sum parallel
+    reset <=1; update_mode<=1; sum <= 0; mode <= 1; #CLOCK_PERIOD;
     reset <= 0; #CLOCK_PERIOD;
-    // RUN_TEST;
+    RUN_TEST;
 
-    // mode=1 to test inverse sum
-    reset <=1; update_mode<=0; sum <= 12; mode <= 1; #CLOCK_PERIOD;
+    // mode=1 to test inverse sum sequential
+    reset <=1; update_mode<=0; sum <= 7; mode <= 1; #CLOCK_PERIOD;
     reset <= 0; #CLOCK_PERIOD;
-    // RUN_TEST;
+    RUN_TEST;
     
     $fclose(test_data);
     $stop;
 end
 endmodule
+
+
+
+//     //tau test sequential subtraction
+//     // mode=2 to test subtraction sequential
+//     // no annealing
+//     reset <=1; update_mode<=1; a <= 1; b <= 7; mode <= 0; I_min<=4'b0010; I_max<=4'b1111; log_tau<=10; #CLOCK_PERIOD;
+//     reset <= 0; #CLOCK_PERIOD;
+//     RUN_TEST;
+//     $display("Percentage of cycles where bit was equal to 1:");
+//     $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
+//     $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
+//      // mode=2 to test subtraction sequential
+//     reset <=1; update_mode<=0; a <= 1; sum <= 8; mode <= 2;I_max <= 4'b1111;log_tau<=9; #CLOCK_PERIOD;
+//     reset <= 0; #CLOCK_PERIOD;
+//     RUN_TEST;
+//     $display("Percentage of cycles where bit was equal to 1:");
+//     $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
+//     $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
+//      // mode=2 to test subtraction sequential
+//     reset <=1; update_mode<=0; a <= 1; sum <= 8; mode <= 2; log_tau<=8; #CLOCK_PERIOD;
+//     reset <= 0; #CLOCK_PERIOD;
+//     RUN_TEST;
+//     $display("Percentage of cycles where bit was equal to 1:");
+//     $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
+//     $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
+//      // mode=2 to test subtraction sequential
+//     reset <=1; update_mode<=0; a <= 1; sum <= 8; mode <= 2; log_tau<=7; #CLOCK_PERIOD;
+//     reset <= 0; #CLOCK_PERIOD;
+//     RUN_TEST;
+//     $display("Percentage of cycles where bit was equal to 1:");
+//     $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
+//     $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
+    
+//  // mode=2 to test subtraction sequential
+//     reset <=1; update_mode<=0; a <= 1; sum <= 8; mode <= 2; log_tau<=6; #CLOCK_PERIOD;
+//     reset <= 0; #CLOCK_PERIOD;
+//     RUN_TEST;
+//     $display("Percentage of cycles where bit was equal to 1:");
+//     $display("A=%d,Sum=%d: Bit percentages: %d%%, %d%%, %d%%, %d%% after %d cycles", a, sum, net_sum[3]*100/steps, net_sum[2]*100/steps, net_sum[1]*100/steps, net_sum[0]*100/steps, steps);
+//     $display("Expected bit averages: %b.  Results: %b", sum-a, {net_sum[3]*1.0/steps>0.5,net_sum[2]*1.0/steps>0.5,net_sum[1]*1.0/steps>0.5,net_sum[0]*1.0/steps>0.5});
+    
+
+
+
+
+
+
+
+
 // // failed task attempt. worked with global variables (shrug emoji)
 // task TEST_LOOP;
 //     input overflow, update_mode;

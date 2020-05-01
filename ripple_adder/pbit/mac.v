@@ -11,7 +11,7 @@ input [N_NEIGHBORS-1:0] p_in;   // input p bits
 input [3:0] I_0; // unsigned scaling. fixed point [2][2]
 output reg signed [OUT_PRECISION-1:0] out;
 reg signed [WEIGHT_PRECISION-1:0] weighted_p[N_NEIGHBORS-1:0];
-reg signed [WEIGHT_PRECISION+3:0] weighted_sum;  // max 16 connections
+reg signed [WEIGHT_PRECISION+3:0] weighted_sum,a,b,c;  // max 16 connections
 reg signed [WEIGHT_PRECISION+7:0] scaled_sum;  // max 16 connections; scqled by 4 bit I_0, then shifted two back right
 reg signed [WEIGHT_PRECISION+7:0] scaled_sum_preshift; // for debugging
 // multiply p bits with weights in combinational logic
@@ -32,10 +32,14 @@ begin
     // but would need synchronous design
     // TODO: can make this O(log(n)) delay by branching the summations sum = (a+b) + (c+d) 
     weighted_sum = $signed(H);
-    for (i = 0; i < N_NEIGHBORS; i = i + 1) begin
-        // doing manual sign extension
-        weighted_sum = weighted_sum + $signed(weighted_p[i]); //{{4{weighted_p[i][WEIGHT_PRECISION-1]}}, weighted_p[i]};   // blocking addition because we need cumulative sum
-    end
+    // for (i = 0; i < N_NEIGHBORS; i = i + 1) begin
+    //     // doing manual sign extension
+    //     weighted_sum = weighted_sum + $signed(weighted_p[i]); //{{4{weighted_p[i][WEIGHT_PRECISION-1]}}, weighted_p[i]};   // blocking addition because we need cumulative sum
+    // end
+    a = weighted_p[0] + weighted_p[1];
+    b = weighted_p[2] + weighted_p[3];
+    c = a+b;
+    weighted_sum = weighted_sum + c;
 
     // scale with I_0
     // scaled_sum_preshift = $signed(weighted_sum * $signed(I_0));
