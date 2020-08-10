@@ -1,5 +1,5 @@
 # invertible_adder
-invertible adder design in verilog\
+Stochastic computing invertible adder using verilog\
 Uses stochastic bits (pbits) in a boltzmann machine architecture to perform addition and subtraction with the same hardware. 
 ## Modes of Operation
 Forward: addition
